@@ -15,7 +15,7 @@ const PropertySchema = new mongoose.Schema({
   area: { type: String, required: true },
   type: { type: String, required: true },
   features: { type: [String], required: true },  
-  timeAgo: { type: String, required: false },  
+  timeAgo: { type: String, required: false ,default:""},  
   image: { type: String, required: true },     
 }, { timestamps: true });  
 
