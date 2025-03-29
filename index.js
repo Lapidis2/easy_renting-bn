@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./Config/db");
-const routes = require("./Routes/propertyRoute");
-
+const propertyRoute = require("./Routes/propertyRoute");
+const subRoutes =require("./Routes/subRoutes")
 dotenv.config();
 
 connectDB();
@@ -13,7 +13,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-app.use("/api", routes); 
+app.use("/api", propertyRoute); 
+app.use("/api", subRoutes); 
 
 
 app.listen(PORT, () => {
