@@ -102,16 +102,16 @@ const createProperty = async (req, res) => {
 const getProperties = async (req, res) => {
 	try {
 	  const properties = await Property.find();
-  	  properties.forEach(async (property) => {
+	  for (let i = 0; i < properties.length; i++) {
+		const property = properties[i];
 		const updatedTimeAgo = moment(property.createdAt).fromNow();
-		if (property.timeAgo !== updatedTimeAgo) {
+				if (property.timeAgo !== updatedTimeAgo) {
 		  await Property.findByIdAndUpdate(property._id, { timeAgo: updatedTimeAgo });
 		}
-	  });
-  
-	 return  res.status(200).json(properties); 
+	  }
+	  	  return res.status(200).json(properties);
 	} catch (error) {
-	 return res.status(500).json({ message: "Error fetching properties", error: error.message });
+	  return res.status(500).json({ message: "Error fetching properties", error: error.message });
 	}
   };
   
