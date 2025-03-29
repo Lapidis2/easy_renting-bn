@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../config/multer"); 
+const upload = require("../Config/multer"); 
 const { createProperty,getProperties } = require("../Controller/propertyController");
 
 router.post("/createProperty", upload.single("image"), createProperty);
