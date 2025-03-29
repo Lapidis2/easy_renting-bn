@@ -1,4 +1,4 @@
-const cloudinary = require("../config/cloudinary");
+const cloudinary = require("../Config/cloudinary");
 const Property = require("../models/propertyModal");
 const moment = require("moment");
 const subscribeModal =require("../models/subscribeModal")
