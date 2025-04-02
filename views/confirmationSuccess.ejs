@@ -112,18 +112,15 @@
   </div>
 
   <script>
-    // Redirect function
     function redirectToApp() {
-      // Replace '/join' with the actual route to your login page
       window.location.href = '/login';
     }
 
-    // Simulate loading animation
     window.onload = function () {
       const loadingOverlay = document.getElementById('loadingOverlay');
       setTimeout(() => {
         loadingOverlay.style.display = 'none';
-      }, 1500); // Adjust the timeout as needed
+      }, 1500); 
     };
   </script>
 </body>
