@@ -60,7 +60,7 @@ exports.signup = async (req, res) => {
 
     // Setup email options
     const mailOptions = {
-      from: `"Ibirwa Kivu Bike Tour Services" <${process.env.SMTP_USER}>`,
+      from: `"Great Connection Services" <${process.env.SMTP_USER}>`,
       to: newUser.email,
       subject: "Email Confirmation",
       html: `
