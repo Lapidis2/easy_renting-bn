@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const carController = require('../Controller/carController');
+const upload = require('../Config/multer'); 
+router.post('/', upload.single('image'), carController.createCarListing);
+router.get('/', carController.getAllCarListings);
+router.get('/:id', carController.getCarListing);
+router.put('/:id', upload.single('image'), carController.updateCarListing);
+router.delete('/:id', carController.deleteCarListing);
+module.exports = router;

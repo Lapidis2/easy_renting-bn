@@ -10,13 +10,15 @@ const connectDB = require("./Config/db");
 const propertyRoute = require("./Routes/propertyRoute");
 const subRoutes =require("./Routes/subRoutes")
 const userRoutes =require("./Routes/userRoutes")
+const carRoutes = require("./Routes/carRoutes");
+const requestPropertyRoutes = require("./Routes/requestPropertyRoute");
+const supplyPropertyRoutes = require("./Routes/supplyPropertyRoute");
 dotenv.config();
 
 connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-app.use(cors());
 app.use(express.json());
 // Set the view engine to EJS
 app.set("view engine", "ejs");
@@ -65,6 +67,9 @@ app.use(
 app.use("/api", propertyRoute); 
 app.use("/api", subRoutes); 
 app.use("/api", userRoutes); 
+app.use("/api/request-property", requestPropertyRoutes);
+app.use("/api/supply-property", supplyPropertyRoutes);
+app.use('/api/cars', carRoutes);
 
 
 app.listen(PORT, () => {
