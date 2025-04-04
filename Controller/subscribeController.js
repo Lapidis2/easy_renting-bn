@@ -51,7 +51,7 @@ const subscribe = async (req, res) => {
               <p style="font-size: 16px;">Visit site <a href="https://paccy-easy-renting-fn.netlify.app/" target="_blank" style="color: green; text-decoration: underline;">Here</a></p>
           </div>
           <div style="text-align: center; margin-top: 20px;">
-              <p style="color: #ffffff; background-color: #221F2F; padding: 10px; font-size: 14px;">&copy; Copyright 2024 All rights reserved</p>
+              <p style="color: #ffffff; background-color: #221F2F; padding: 10px; font-size: 14px;">&copy; Copyright 2023 All rights reserved</p>
           </div>
       </div>
       `
