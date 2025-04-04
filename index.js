@@ -69,9 +69,9 @@ app.use("/api", subRoutes);
 app.use("/api", userRoutes); 
 app.use("/api/request-property", requestPropertyRoutes);
 app.use("/api/supply-property", supplyPropertyRoutes);
-app.use('/api/cars', carRoutes);
+app.use('/api/car', carRoutes);
 
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on  http://localhost:${PORT}`);
 });
