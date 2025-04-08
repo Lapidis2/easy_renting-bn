@@ -1,9 +1,7 @@
 const RequestProperty = require("../models/requestPropertyModel");
 
-// Create a new property request
 exports.createRequestProperty = async (req, res) => {
   try {
-    // Validate required fields
     if (!req.body.title || !req.body.price || !req.body.location) {
       return res.status(400).json({
         success: false,
