@@ -11,20 +11,18 @@ const propertyRoute = require("./Routes/propertyRoute");
 const subRoutes =require("./Routes/subRoutes")
 const userRoutes =require("./Routes/userRoutes")
 const carRoutes = require("./Routes/carRoutes");
+const landRoutes = require("./Routes/landRoutes");
 const requestPropertyRoutes = require("./Routes/requestPropertyRoute");
 const supplyPropertyRoutes = require("./Routes/supplyPropertyRoute");
+const clothesRoutes = require("./Routes/clothesRoutes");
 dotenv.config();
-
 connectDB();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(express.json());
-// Set the view engine to EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-// ** Middleware **
-app.use(compression()); // Improve performance
+app.use(compression());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
@@ -51,9 +49,7 @@ app.use((req, res, next) => {
   next();
 });
 app.options("*", cors());
-// Serve static files
 app.use(express.static("public"));
-// ** Session Configuration **
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "default-secret",
@@ -62,15 +58,14 @@ app.use(
     cookie: { secure: process.env.NODE_ENV === "production" },
   })
 );
-
-
 app.use("/api", propertyRoute); 
 app.use("/api", subRoutes); 
 app.use("/api", userRoutes); 
 app.use("/api/request-property", requestPropertyRoutes);
 app.use("/api/supply-property", supplyPropertyRoutes);
 app.use('/api/car', carRoutes);
-
+app.use('/api', landRoutes);
+app.use('/api', clothesRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on  http://localhost:${PORT}`);

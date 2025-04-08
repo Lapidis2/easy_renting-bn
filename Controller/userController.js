@@ -1,4 +1,3 @@
-// User Controller
 require("dotenv").config();
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
@@ -16,7 +15,6 @@ const transporter = nodemailer.createTransport({
     rejectUnauthorized: false,
   },
 });
-
 exports.signup = async (req, res) => { 
   try {
     const { email, username, password, role } = req.body;
@@ -35,12 +33,8 @@ exports.signup = async (req, res) => {
         message: "User already exists with that email or Username." 
       });
     }
-
-    // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create a new user
     const newUser = new User({
       email,
       username,
@@ -49,16 +43,10 @@ exports.signup = async (req, res) => {
       isConfirmed: false,
     });
     await newUser.save();
-
-    // Generate a confirmation token
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-
-    // Confirmation URL
-    const confirmationUrl = `${process.env.BASE_URL}/api/users/confirm-email/${token}`;
-
-    // Setup email options
+    const confirmationUrl = `${process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'http://localhost:3000'}/api/users/confirm-email/${token}`;
     const mailOptions = {
       from: `"Great Connection Services" <${process.env.SMTP_USER}>`,
       to: newUser.email,
@@ -69,8 +57,6 @@ exports.signup = async (req, res) => {
         <p>Please click <a href='${confirmationUrl}'>Here</a> to confirm your account.</p>
       `,
     };
-
-    // Send confirmation email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("Error sending confirmation email:", error);
@@ -81,8 +67,6 @@ exports.signup = async (req, res) => {
         return res.status(500).json({ message: "Email rejected. Please check the email address." });
       }
       console.log("Confirmation email sent:", info.response);
-
-      // Return success message and user data
       res.status(201).json({ message: "Signup successful! Please check your email to confirm your account.", user: newUser });
       console.log("Email confirmation sent to:", newUser.email);
     });
@@ -111,7 +95,6 @@ exports.confirmEmail = async (req, res) => {
     res.status(500).render("confirmationFailure");
   }
 };
-
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select("-password");
@@ -268,7 +251,6 @@ exports.logout = (req, res) => {
     res.status(500).json({ message: "Server error occurred during logout." });
   }
 };
-
 exports.getSessionData = (req, res) => {
   try {
     if (!req.session.user) {
@@ -281,7 +263,6 @@ exports.getSessionData = (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 exports.getMonthlySignups = async (req, res) => {
   try {
     const signups = await User.aggregate([
@@ -318,7 +299,6 @@ exports.getMonthlySignups = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 exports.restricted = (req, res) => {
 
     if (!req.user || req.user.role !== "admin") {

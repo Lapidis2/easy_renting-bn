@@ -1,18 +1,13 @@
 const CarListing = require('../models/carModel');
-const cloudinary = require('cloudinary').v2; // If using Cloudinary
+const cloudinary = require('cloudinary').v2;
 
-// Create New Car Listing
 exports.createCarListing = async (req, res) => {
   try {
-    // Process image upload
-    const imageData = req.file ? {
-      public_id: req.file.filename,
-      secure_url: req.file.path
-    } : null;
+    const imageData = req.file ? req.file : null;
 
     const newCar = new CarListing({
       ...req.body,
-      image: imageData
+      image: imageData ? imageData.path : null // Store only the URL (or path) of the image
     });
 
     const savedCar = await newCar.save();
@@ -29,15 +24,12 @@ exports.createCarListing = async (req, res) => {
   }
 };
 
-// Get All Car Listings
 exports.getAllCarListings = async (req, res) => {
   try {
-    // Pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Filtering
     const filter = {};
     if (req.query.status) filter.status = req.query.status;
     if (req.query.fuel) filter.fuel = req.query.fuel;
@@ -63,7 +55,6 @@ exports.getAllCarListings = async (req, res) => {
   }
 };
 
-// Get Single Car Listing
 exports.getCarListing = async (req, res) => {
   try {
     const car = await CarListing.findById(req.params.id);
@@ -85,16 +76,12 @@ exports.getCarListing = async (req, res) => {
   }
 };
 
-// Update Car Listing
 exports.updateCarListing = async (req, res) => {
   try {
     const updatedData = { ...req.body };
     
     if (req.file) {
-      updatedData.image = {
-        public_id: req.file.filename,
-        secure_url: req.file.path
-      };
+      updatedData.image = req.file.path; // Store only the image URL (or path)
     }
 
     const updatedCar = await CarListing.findByIdAndUpdate(
@@ -122,7 +109,6 @@ exports.updateCarListing = async (req, res) => {
   }
 };
 
-// Delete Car Listing
 exports.deleteCarListing = async (req, res) => {
   try {
     const car = await CarListing.findByIdAndDelete(req.params.id);
@@ -135,8 +121,9 @@ exports.deleteCarListing = async (req, res) => {
     }
 
     // Optional: Delete image from Cloudinary
-    if (car.image.public_id) {
-      await cloudinary.uploader.destroy(car.image.public_id);
+    if (car.image) {
+      const publicId = car.image.split('/').pop().split('.').shift(); // Assuming the URL is in the format of Cloudinary URL
+      await cloudinary.uploader.destroy(publicId); // Delete image from Cloudinary
     }
 
     res.status(200).json({
