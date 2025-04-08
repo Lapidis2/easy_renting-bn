@@ -16,10 +16,7 @@ const supplyPropertySchema = new mongoose.Schema({
   type: String,
   features: String,
   timeAgo: String,
-  image: {
-    public_id: String, 
-    secure_url: String, 
-  },
+  image:  String
 });
 
 const supplyProperty = mongoose.model("SupplyProperty", supplyPropertySchema);
