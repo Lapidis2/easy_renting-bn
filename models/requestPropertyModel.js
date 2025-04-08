@@ -23,6 +23,5 @@ const requestPropertySchema = new mongoose.Schema({
   },
 });
 
-// Create the model
 const RequestProperty = mongoose.model("RequestProperty", requestPropertySchema);
 module.exports = RequestProperty;
