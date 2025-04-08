@@ -151,7 +151,6 @@ exports.updateRequest = async (req, res) => {
   }
 };
 
-// Delete property request
 exports.deleteRequest = async (req, res) => {
   try {
     const deletedRequest = await RequestProperty.findByIdAndDelete(req.params.id);
@@ -162,10 +161,6 @@ exports.deleteRequest = async (req, res) => {
         message: "Request not found"
       });
     }
-
-    // Here you might want to delete the Cloudinary image as well
-    // await cloudinary.uploader.destroy(deletedRequest.image.public_id);
-
     res.status(200).json({
       success: true,
       message: "Request deleted successfully"
