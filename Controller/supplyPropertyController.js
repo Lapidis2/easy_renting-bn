@@ -1,60 +1,50 @@
 const SupplyProperty = require("../models/supplyPropertyModel");
 
-// Create a new property request
+// CREATE
 exports.createSupplyProperty = async (req, res) => {
   try {
-    // Validate required fields
     if (!req.body.title || !req.body.price || !req.body.location) {
       return res.status(400).json({
         success: false,
-        message: "Title, price, and location are required fields"
+        message: "Title, price, and location are required fields",
       });
     }
 
-    // Process image if uploaded
-    const imageData = req.file ? {
-      public_id: req.file.filename,
-      secure_url: req.file.path,
-      uploadedAt: new Date()
-    } : null;
+    const imageData = req.file ? req.file.path : null;
 
-    // Create new request
     const newRequest = new SupplyProperty({
       ...req.body,
       image: imageData,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
 
-    // Save to database
     const savedRequest = await newRequest.save();
-    
+
     res.status(201).json({
       success: true,
       data: savedRequest,
-      message: "Property request created successfully"
+      message: "Property request created successfully",
     });
-
   } catch (error) {
     console.error("Error creating property request:", error);
     res.status(500).json({
       success: false,
-      message: error.message || "Server error while creating request"
+      message: error.message || "Server error while creating request",
     });
   }
 };
 
-// Get all property requests (with pagination)
+// GET ALL
 exports.getAllRequest = async (req, res) => {
   try {
-    // Pagination parameters
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     const [requests, total] = await Promise.all([
       SupplyProperty.find().skip(skip).limit(limit),
-      SupplyProperty.countDocuments()
+      SupplyProperty.countDocuments(),
     ]);
 
     res.status(200).json({
@@ -63,95 +53,95 @@ exports.getAllRequest = async (req, res) => {
       total,
       page,
       pages: Math.ceil(total / limit),
-      data: requests
+      data: requests,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to fetch requests"
+      message: error.message || "Failed to fetch requests",
     });
   }
 };
 
-// Get single property request
+// GET ONE
 exports.getSingleRequest = async (req, res) => {
   try {
     const request = await SupplyProperty.findById(req.params.id);
-    
+
     if (!request) {
       return res.status(404).json({
         success: false,
-        message: "Request not found"
+        message: "Request not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
-      data: request
+      data: request,
     });
   } catch (error) {
-    if (error.name === 'CastError') {
+    if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid request ID format"
+        message: "Invalid request ID format",
       });
     }
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to fetch request"
+      message: error.message || "Failed to fetch request",
     });
   }
 };
 
-// Update property request
+// UPDATE
 exports.updateRequest = async (req, res) => {
   try {
-    // Process image update if new file uploaded
-    const updateData = { ...req.body, updatedAt: new Date() };
+    const updateData = {
+      ...req.body,
+      updatedAt: new Date(),
+    };
+
     if (req.file) {
-      updateData.image = {
-        public_id: req.file.filename,
-        secure_url: req.file.path,
-        updatedAt: new Date()
-      };
+      updateData.image = req.file.path;
     }
 
     const updatedRequest = await SupplyProperty.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { 
+      {
         new: true,
-        runValidators: true 
+        runValidators: true,
       }
     );
 
     if (!updatedRequest) {
       return res.status(404).json({
         success: false,
-        message: "Request not found"
+        message: "Request not found",
       });
     }
 
     res.status(200).json({
       success: true,
       data: updatedRequest,
-      message: "Request updated successfully"
+      message: "Request updated successfully",
     });
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
-        message: error.message
+        message: error.message,
       });
     }
+
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to update request"
+      message: error.message || "Failed to update request",
     });
   }
 };
 
-// Delete property request
+// DELETE
 exports.deleteRequest = async (req, res) => {
   try {
     const deletedRequest = await SupplyProperty.findByIdAndDelete(req.params.id);
@@ -159,21 +149,18 @@ exports.deleteRequest = async (req, res) => {
     if (!deletedRequest) {
       return res.status(404).json({
         success: false,
-        message: "Request not found"
+        message: "Request not found",
       });
     }
 
-    // Here you might want to delete the Cloudinary image as well
-    // await cloudinary.uploader.destroy(deletedRequest.image.public_id);
-
     res.status(200).json({
       success: true,
-      message: "Request deleted successfully"
+      message: "Request deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to delete request"
+      message: error.message || "Failed to delete request",
     });
   }
 };
