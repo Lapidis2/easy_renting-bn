@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const authorizeRole = require("../middleware/authorizeRole");
-const authenticate = require("../middleware/authenticate");
+const upload = require("../Config/multer");
 const requestPropertyController = require("../Controller/requestPropertyController");
 
-router.post("/",authenticate,authorizeRole(["admin"]) ,requestPropertyController.createRequestProperty);
+router.post("/",upload.single("image"),requestPropertyController.createRequestProperty);
 router.get("/", requestPropertyController.getAllRequest);
 router.get("/:id", requestPropertyController.getSingleRequest);
-router.put("/:id", requestPropertyController.updateRequest);
+router.put("/:id",upload.single("image"), requestPropertyController.updateRequest);
 router.delete("/:id", requestPropertyController.deleteRequest);
 module.exports = router;

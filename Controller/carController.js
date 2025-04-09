@@ -14,7 +14,7 @@ exports.createCarListing = async (req, res) => {
     
     res.status(201).json({
       success: true,
-      data: savedCar
+      savedCar
     });
   } catch (error) {
     res.status(400).json({
