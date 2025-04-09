@@ -14,7 +14,7 @@ exports.createLandListing = async (req, res) => {
     
     res.status(201).json({
       success: true,
-      data: savedLand
+      savedLand
     });
   } catch (error) {
     res.status(400).json({

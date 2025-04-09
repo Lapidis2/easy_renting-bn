@@ -2,31 +2,30 @@ const RequestProperty = require("../models/requestPropertyModel");
 
 exports.createRequestProperty = async (req, res) => {
   try {
+
+    const { title, price, location, ...rest } = req.body;
+
+
     if (!req.body.title || !req.body.price || !req.body.location) {
       return res.status(400).json({
         success: false,
         message: "Title, price, and location are required fields"
       });
     }
+    const imagePath = req.file ? req.file.path : null;
 
-    // Process image if uploaded
-    const imageData = req.file ? {
-      public_id: req.file.filename,
-      secure_url: req.file.path,
-      uploadedAt: new Date()
-    } : null;
-
-    // Create new request
     const newRequest = new RequestProperty({
-      ...req.body,
-      image: imageData,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      title,
+      price,
+      location,
+      image: imagePath,
+      ...rest,
+      createdAt: new Date().toDateString(),
+      updatedAt: new Date().toDateString(),
     });
 
-    // Save to database
     const savedRequest = await newRequest.save();
-    
+
     res.status(201).json({
       success: true,
       data: savedRequest,
@@ -41,11 +40,8 @@ exports.createRequestProperty = async (req, res) => {
     });
   }
 };
-
-// Get all property requests (with pagination)
 exports.getAllRequest = async (req, res) => {
   try {
-    // Pagination parameters
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -70,19 +66,16 @@ exports.getAllRequest = async (req, res) => {
     });
   }
 };
-
-// Get single property request
 exports.getSingleRequest = async (req, res) => {
   try {
     const request = await RequestProperty.findById(req.params.id);
-    
+
     if (!request) {
       return res.status(404).json({
         success: false,
         message: "Request not found"
       });
     }
-    
     res.status(200).json({
       success: true,
       data: request
@@ -100,26 +93,19 @@ exports.getSingleRequest = async (req, res) => {
     });
   }
 };
-
-// Update property request
 exports.updateRequest = async (req, res) => {
   try {
-    // Process image update if new file uploaded
     const updateData = { ...req.body, updatedAt: new Date() };
-    if (req.file) {
-      updateData.image = {
-        public_id: req.file.filename,
-        secure_url: req.file.path,
-        updatedAt: new Date()
-      };
-    }
 
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
     const updatedRequest = await RequestProperty.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { 
+      {
         new: true,
-        runValidators: true 
+        runValidators: true
       }
     );
 
@@ -129,7 +115,6 @@ exports.updateRequest = async (req, res) => {
         message: "Request not found"
       });
     }
-
     res.status(200).json({
       success: true,
       data: updatedRequest,
@@ -148,7 +133,6 @@ exports.updateRequest = async (req, res) => {
     });
   }
 };
-
 exports.deleteRequest = async (req, res) => {
   try {
     const deletedRequest = await RequestProperty.findByIdAndDelete(req.params.id);
@@ -159,6 +143,7 @@ exports.deleteRequest = async (req, res) => {
         message: "Request not found"
       });
     }
+
     res.status(200).json({
       success: true,
       message: "Request deleted successfully"
