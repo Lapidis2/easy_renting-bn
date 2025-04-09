@@ -8,7 +8,7 @@ router.get("/profile", authMiddleware, userController.getUserProfile);
 router.put("/profile", authMiddleware, userController.updateUserProfile);
 router.delete("/profile", authMiddleware, userController.deleteUser);
 router.post("/signup", userController.signup);
-router.get("/confirm-email/:token", userController.confirmEmail);
+router.get("/api/confirm-email/:token", userController.confirmEmail);
 router.post("/login", userController.login);
 router.post("/logout", userController.logout);
 router.delete("/user/:id", userController.deleteUser);

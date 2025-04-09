@@ -62,6 +62,8 @@ app.use("/api", propertyRoute);
 app.use("/api", subRoutes); 
 app.use("/api", userRoutes); 
 app.use("/api/request-property", requestPropertyRoutes);
+app.use("/api/signup", userRoutes);
+app.use("/api/login", userRoutes);
 app.use("/api/supply-property", supplyPropertyRoutes);
 app.use("/api/get-all-property",supplyPropertyRoutes )
 app.use('/api/car', carRoutes);
