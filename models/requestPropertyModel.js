@@ -1,12 +1,10 @@
 const mongoose = require("mongoose");
 
-// Define the schema
 const requestPropertySchema = new mongoose.Schema({
-  id: String,
-  title: String,
-  price: String,
+  title: { type: String, required: true },
+  price: { type: String, required: true },
   status: String,
-  location: String,
+  location: { type: String, required: true },
   requesterName: String,
   contact: String,
   description: String,
@@ -16,13 +14,10 @@ const requestPropertySchema = new mongoose.Schema({
   area: String,
   type: String,
   features: String,
-  timeAgo: String,
-  image: {
-    public_id: String, 
-    secure_url: String, 
-  },
+  image: String, 
+},
+{
+  timestamps: true,
 });
-
-// Create the model
 const RequestProperty = mongoose.model("RequestProperty", requestPropertySchema);
 module.exports = RequestProperty;
