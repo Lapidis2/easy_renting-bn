@@ -46,7 +46,8 @@ exports.signup = async (req, res) => {
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    const confirmationUrl = `${process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'http://localhost:3000'}/api/users/confirm-email/${token}`;
+    const confirmationUrl = 'http://localhost:3000/api/confirm-email/:token';
+	console.log("Confirmation URL:", confirmationUrl);
     const mailOptions = {
       from: `"Great Connection Services" <${process.env.SMTP_USER}>`,
       to: newUser.email,
@@ -67,8 +68,8 @@ exports.signup = async (req, res) => {
         return res.status(500).json({ message: "Email rejected. Please check the email address." });
       }
       console.log("Confirmation email sent:", info.response);
-      res.status(201).json({ message: "Signup successful! Please check your email to confirm your account.", user: newUser });
-      console.log("Email confirmation sent to:", newUser.email);
+      res.status(201).json({ message: "Signup successful! Please check your email to confirm your account.", user: newUser, token: token });
+      console.log("Email confirmation sent to:", newUser.email)
     });
   } catch (error) {
     console.error("Signup error:", error);
@@ -148,8 +149,6 @@ exports.deleteUser = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Validate required fields
     if (!email || !password) {
       return res
         .status(400)
@@ -160,12 +159,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check if the user's email is confirmed
-    if (!user.isConfirmed) {
-      return res
-        .status(403)
-        .json({ message: "Please confirm your email before logging in." });
-    }
+    // if (!user.isConfirmed) {
+    //   return res
+    //     .status(403)
+    //     .json({ message: "Please confirm your email before logging in." });
+    // }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -180,7 +178,7 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    // Ensure req.session is defined before setting properties
+
     if (req.session) {
       req.session.user = {
         userId: user._id,
@@ -193,16 +191,17 @@ exports.login = async (req, res) => {
       "userPreferences",
       JSON.stringify({ theme: "dark", language: "en" }),
       {
-        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-        secure: process.env.NODE_ENV === "production", // Ensures cookie is only sent over HTTPS in production
-        maxAge: 24 * 60 * 60 * 1000, // Cookie will expire in 1 day
-        sameSite: "lax", // Helps protect against CSRF attacks
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production", 
+        maxAge: 24 * 60 * 60 * 1000, 
+        sameSite: "lax", 
       }
     );
 
     res
       .status(200)
-      .json({ message: "User logged in successfully", token, user });
+      .json({ message: "User logged in successfully", token, user:user });
+	  console.log("User logged in successfully:", user,token);
   } catch (error) {
     console.error("Error logging in user:", error);
     res.status(500).json({ message: "Server error", error: error.message });
