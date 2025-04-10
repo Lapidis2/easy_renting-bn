@@ -2,23 +2,24 @@ const cloudinary = require("../Config/cloudinary");
 const Property = require("../models/propertyModal");
 const moment = require("moment");
 const nodemailer = require("nodemailer");
-const subscribeModal =require("../models/subscribeModal")
+const subscribeModal = require("../models/subscribeModal");
+
 const createProperty = async (req, res) => {
   try {
-    const { 
-      title, 
-      price, 
-      status, 
-      location, 
-      owner, 
-      contact, 
-      description, 
-      bedrooms, 
-      bathrooms, 
-      toilets, 
-      area, 
-      type, 
-      features 
+    const {
+      title,
+      price,
+      status,
+      location,
+      owner,
+      contact,
+      description,
+      bedrooms,
+      bathrooms,
+      toilets,
+      area,
+      type,
+      features
     } = req.body;
 
     const uploadedImage = req.file;
@@ -26,7 +27,7 @@ const createProperty = async (req, res) => {
       return res.status(400).json({ message: "Image upload failed" });
     }
 
-    const imageUrl = uploadedImage.path;  
+    const imageUrl = uploadedImage.path;
     const newProperty = new Property({
       title,
       price,
@@ -42,10 +43,11 @@ const createProperty = async (req, res) => {
       type,
       features,
       image: imageUrl,
-	  timeAgo: moment().fromNow(),
+      timeAgo: moment().fromNow(),
     });
 
     await newProperty.save();
+
     if (newProperty) {
       const selectEmails = await subscribeModal.find();
       if (selectEmails.length > 0) {
@@ -80,7 +82,7 @@ const createProperty = async (req, res) => {
                     <a href="https://paccy-easy-renting-fn.netlify.app/openedblog?id=${newProperty._id}" style="display: inline-block; padding: 10px 20px; background-color: green; color: white; text-decoration: underline; border-radius: 5px;">See house here</a>
                     <p style="color: #666;">If you have any questions or feedback, feel free to reply to this email.</p>
                     <p style="color: #666;">Thank you for being a valued subscriber!</p>
-                    <p style="color: #666;">Best Regards,<br> <span style="color:green"> GREATCONNECTION GROUP </span></p>
+                    <p style="color: #666;">Best Regards,<br> <span style="color:green">GREATCONNECTION GROUP</span></p>
                   </div>
                 </div>
               `,
@@ -95,26 +97,120 @@ const createProperty = async (req, res) => {
         }
       }
     }
-	return res.status(201).json({ status: "success", message: "Property created successfully", newProperty });
+
+    return res.status(201).json({ status: "success", message: "Property created successfully", newProperty });
   } catch (error) {
     return res.status(400).json({ message: "Error creating property", error: error.message });
-}};
+  }
+};
 
 const getProperties = async (req, res) => {
-	try {
-	  const properties = await Property.find();
-	  for (let i = 0; i < properties.length; i++) {
-		const property = properties[i];
-		const updatedTimeAgo = moment(property.createdAt).fromNow();
-				if (property.timeAgo !== updatedTimeAgo) {
-		  await Property.findByIdAndUpdate(property._id, { timeAgo: updatedTimeAgo });
-		}
-	  }
-	  	  return res.status(200).json(properties);
-	} catch (error) {
-	  return res.status(500).json({ message: "Error fetching properties", error: error.message });
-	}
-  };
-  
+  try {
+    const {
+      status,
+      location,
+      type,
+      bedrooms,
+      minPrice,
+      maxPrice,
+      sortBy
+    } = req.query;
 
-module.exports = { createProperty, getProperties };
+    const query = {};
+
+    if (status) query.status = status;
+    if (location) query.location = { $regex: location, $options: 'i' };
+    if (type) query.type = type;
+    if (bedrooms) query.bedrooms = bedrooms;
+
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = parseFloat(minPrice);
+      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+    }
+
+    const sortOption = {};
+    if (sortBy) {
+      const [field, order] = sortBy.split(":"); // e.g. createdAt:desc
+      sortOption[field] = order === "desc" ? -1 : 1;
+    }
+
+    const properties = await Property.find(query).sort(sortOption);
+
+    // Update `timeAgo` field if outdated
+    for (let i = 0; i < properties.length; i++) {
+      const property = properties[i];
+      const updatedTimeAgo = moment(property.createdAt).fromNow();
+      if (property.timeAgo !== updatedTimeAgo) {
+        await Property.findByIdAndUpdate(property._id, { timeAgo: updatedTimeAgo });
+      }
+    }
+
+    return res.status(200).json(properties);
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching properties", error: error.message });
+  }
+};
+
+const deleteProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const property = await Property.findByIdAndDelete(id);
+
+    if (!property) {
+      return res.status(404).json({ status: "fail", message: "Property not found" });
+    }
+
+    return res.status(200).json({ status: "success", message: "Property deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error deleting property", error: error.message });
+  }
+};
+
+
+const updateProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // Optional: Handle image update if a new one is uploaded
+    if (req.file) {
+      updates.image = req.file.path;
+    }
+
+    const updatedProperty = await Property.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProperty) {
+      return res.status(404).json({ status: "fail", message: "Property not found" });
+    }
+
+    return res.status(200).json({ status: "success", message: "Property updated", updatedProperty });
+  } catch (error) {
+    return res.status(500).json({ message: "Error updating property", error: error.message });
+  }
+};
+const getPropertyById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const property = await Property.findById(id);
+
+    if (!property) {
+      return res.status(404).json({ status: "fail", message: "Property not found" });
+    }
+
+    return res.status(200).json({ status: "success", property });
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching property", error: error.message });
+  }
+};
+
+module.exports = {
+  createProperty,
+  getProperties,
+  deleteProperty,
+  updateProperty,
+  getPropertyById,
+};

@@ -3,7 +3,9 @@ const SupplyProperty = require("../models/supplyPropertyModel");
 // CREATE
 exports.createSupplyProperty = async (req, res) => {
   try {
-    if (!req.body.title || !req.body.price || !req.body.location) {
+    const { title, price, location, ...rest } = req.body;
+
+    if (!title || !price || !location) {
       return res.status(400).json({
         success: false,
         message: "Title, price, and location are required fields",
@@ -13,8 +15,11 @@ exports.createSupplyProperty = async (req, res) => {
     const imageData = req.file ? req.file.path : null;
 
     const newRequest = new SupplyProperty({
-      ...req.body,
+      title,
+      price,
+      location,
       image: imageData,
+      ...rest,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -24,27 +29,54 @@ exports.createSupplyProperty = async (req, res) => {
     res.status(201).json({
       success: true,
       data: savedRequest,
-      message: "Property request created successfully",
+      message: "Supply property created successfully",
     });
   } catch (error) {
-    console.error("Error creating property request:", error);
+    console.error("Error creating supply property:", error);
     res.status(500).json({
       success: false,
-      message: error.message || "Server error while creating request",
+      message: error.message || "Server error while creating supply property",
     });
   }
 };
 
-// GET ALL
+// GET ALL with Search, Sort, Filter, Pagination
 exports.getAllRequest = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'limit', 'sort', 'search'];
+    excludedFields.forEach((field) => delete queryObj[field]);
+
+    // Search logic
+    let searchQuery = {};
+    if (req.query.search) {
+      const regex = new RegExp(req.query.search, 'i');
+      searchQuery = {
+        $or: [
+          { title: { $regex: regex } },
+          { location: { $regex: regex } },
+        ],
+      };
+    }
+
+    const finalQuery = {
+      ...queryObj,
+      ...searchQuery,
+    };
+
+    // Sorting
+    let sortBy = { createdAt: -1 };
+    if (req.query.sort) {
+      sortBy = req.query.sort.split(',').join(' ');
+    }
+
     const [requests, total] = await Promise.all([
-      SupplyProperty.find().skip(skip).limit(limit),
-      SupplyProperty.countDocuments(),
+      SupplyProperty.find(finalQuery).sort(sortBy).skip(skip).limit(limit),
+      SupplyProperty.countDocuments(finalQuery),
     ]);
 
     res.status(200).json({
@@ -58,7 +90,7 @@ exports.getAllRequest = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to fetch requests",
+      message: error.message || "Failed to fetch supply properties",
     });
   }
 };
@@ -71,7 +103,7 @@ exports.getSingleRequest = async (req, res) => {
     if (!request) {
       return res.status(404).json({
         success: false,
-        message: "Request not found",
+        message: "Supply property not found",
       });
     }
 
@@ -83,12 +115,12 @@ exports.getSingleRequest = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid request ID format",
+        message: "Invalid ID format",
       });
     }
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to fetch request",
+      message: error.message || "Failed to fetch supply property",
     });
   }
 };
@@ -117,14 +149,14 @@ exports.updateRequest = async (req, res) => {
     if (!updatedRequest) {
       return res.status(404).json({
         success: false,
-        message: "Request not found",
+        message: "Supply property not found",
       });
     }
 
     res.status(200).json({
       success: true,
       data: updatedRequest,
-      message: "Request updated successfully",
+      message: "Supply property updated successfully",
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -136,7 +168,7 @@ exports.updateRequest = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to update request",
+      message: error.message || "Failed to update supply property",
     });
   }
 };
@@ -149,18 +181,18 @@ exports.deleteRequest = async (req, res) => {
     if (!deletedRequest) {
       return res.status(404).json({
         success: false,
-        message: "Request not found",
+        message: "Supply property not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Request deleted successfully",
+      message: "Supply property deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to delete request",
+      message: error.message || "Failed to delete supply property",
     });
   }
 };
