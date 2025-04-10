@@ -2,9 +2,10 @@ const RequestProperty = require("../models/requestPropertyModel");
 
 exports.createRequestProperty = async (req, res) => {
   try {
+
     const { title, price, location, ...rest } = req.body;
 
-    if (!title || !price || !location) {
+    if (!req.body.title || !req.body.price || !req.body.location) {
       return res.status(400).json({
         success: false,
         message: "Title, price, and location are required fields",
@@ -38,7 +39,7 @@ exports.createRequestProperty = async (req, res) => {
       message: error.message || "Server error while creating request",
     });
   }
-};
+}
 
 exports.getAllRequest = async (req, res) => {
   try {
