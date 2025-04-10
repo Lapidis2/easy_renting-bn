@@ -69,7 +69,7 @@ app.use("/api/get-all-property",supplyPropertyRoutes )
 app.use('/api/car', carRoutes);
 app.use('/api', landRoutes);
 app.use('/api', clothesRoutes);
-
+app.use("/api/confirm-email", userRoutes);	
 app.listen(PORT, () => {
   console.log(`Server is running on  http://localhost:${PORT}`);
 });
