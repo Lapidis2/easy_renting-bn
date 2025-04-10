@@ -46,8 +46,12 @@ exports.signup = async (req, res) => {
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    const confirmationUrl = `http://localhost:3000/api/confirm-email/${token}`;
-	console.log("Confirmation URL:", confirmationUrl);
+	const baseUrl =
+	process.env.NODE_ENV === "production"
+	  ? "https://easy-renting-bn.onrender.com"
+	  : "http://localhost:3000";
+  
+  const confirmationUrl = `${baseUrl}/api/confirm-email/${token}`;
     const mailOptions = {
       from: `"Great Connection Services" <${process.env.SMTP_USER}>`,
       to: newUser.email,
