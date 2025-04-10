@@ -159,11 +159,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // if (!user.isConfirmed) {
-    //   return res
-    //     .status(403)
-    //     .json({ message: "Please confirm your email before logging in." });
-    // }
+    if (!user.isConfirmed) {
+      return res
+        .status(403)
+        .json({ message: "Please confirm your email before logging in." });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
