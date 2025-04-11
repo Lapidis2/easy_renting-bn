@@ -26,29 +26,25 @@ app.set("views", path.join(__dirname, "views"));
 app.use(compression());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      process.env.CLIENT_URL,
-    ],
-    methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+const allowedOrigins = [
+	"http://localhost:5173",
+	"https://paccy-easy-renting-fn.netlify.app"
+  ];
+  
+  app.use(
+	cors({
+	  origin: function (origin, callback) {
+		if (!origin || allowedOrigins.includes(origin)) {
+		  callback(null, true);
+		} else {
+		  callback(new Error("Not allowed by CORS"));
+		}
+	  },
+	  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+	  credentials: true,
+	  allowedHeaders: ["Content-Type", "Authorization"],
+	})
   );
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-    return res.status(200).json({});
-  }
-  next();
-});
 app.options("*", cors());
 app.use(express.static("public"));
 app.use(
@@ -64,12 +60,14 @@ app.use("/api", propertyRoute);
 app.use("/api", subRoutes); 
 app.use("/api", userRoutes); 
 app.use("/api/request-property", requestPropertyRoutes);
+app.use("/api/signup", userRoutes);
+app.use("/api/login", userRoutes);
 app.use("/api/supply-property", supplyPropertyRoutes);
 app.use("/api/get-all-property",supplyPropertyRoutes )
 app.use('/api/car', carRoutes);
 app.use('/api', landRoutes);
 app.use('/api', clothesRoutes);
-
+app.use("/api/confirm-email", userRoutes);	
 app.listen(PORT, () => {
   console.log(`Server is running on  http://localhost:${PORT}`);
 });
