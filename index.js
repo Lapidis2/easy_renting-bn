@@ -15,6 +15,7 @@ const landRoutes = require("./Routes/landRoutes");
 const requestPropertyRoutes = require("./Routes/requestPropertyRoute");
 const supplyPropertyRoutes = require("./Routes/supplyPropertyRoute");
 const clothesRoutes = require("./Routes/clothesRoutes");
+const searchRoutes = require("./Routes/searchRoutes");
 dotenv.config();
 connectDB();
 const app = express();
@@ -58,6 +59,7 @@ app.use(
     cookie: { secure: process.env.NODE_ENV === "production" },
   })
 );
+app.use('/api', searchRoutes); 
 app.use("/api", propertyRoute); 
 app.use("/api", subRoutes); 
 app.use("/api", userRoutes); 
