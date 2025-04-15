@@ -1,4 +1,5 @@
 
+const e = require("express");
 const mongoose = require("mongoose");
 
 const PropertySchema = new mongoose.Schema({
@@ -14,10 +15,17 @@ const PropertySchema = new mongoose.Schema({
   bathrooms: { type: Number, required: true },
   toilets: { type: Number, required: true },
   area: { type: String, required: true },
-  type: { type: String, required: true },
+  type: { 
+    type: String, 
+    required: true ,
+    enum: ['House', 'Apartment', 'Hotel'] ,
+    default: 'House'
+  },
   features: { type: [String], required: true },  
   timeAgo: { type: String, required: false ,default:""},  
       
-}, { timestamps: true });  
+},
+ { timestamps: true }
+);  
 
 module.exports = mongoose.model("Property", PropertySchema);
