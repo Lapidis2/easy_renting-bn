@@ -16,14 +16,9 @@ exports.handleSearch = async (req, res) => {
     if (!category || !modelMap[category]) {
       return res.status(400).json({ error: 'Invalid or missing category' });
     }
-  
     try {
-      // Fetch all items for the selected category
       const allItems = await modelMap[category].find({});
-  
       let results = allItems;
-  
-      // Keyword search: title, area, price (string includes)
       if (search) {
         const searchLower = search.toLowerCase();
         results = results.filter(item =>
