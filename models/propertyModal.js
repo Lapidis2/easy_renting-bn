@@ -1,5 +1,4 @@
 
-const e = require("express");
 const mongoose = require("mongoose");
 
 const PropertySchema = new mongoose.Schema({

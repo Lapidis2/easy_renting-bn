@@ -207,10 +207,28 @@ const getPropertyById = async (req, res) => {
   }
 };
 
+const getPropertiesByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+
+    if (!['House', 'Apartment', 'Hotel'].includes(type)) {
+      return res.status(400).json({ status: "fail", message: "Invalid property type" });
+    }
+
+    const properties = await Property.find({ type });
+
+    return res.status(200).json({ status: "success", properties });
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching properties by type", error: error.message });
+  }
+};
+
+
 module.exports = {
   createProperty,
   getProperties,
   deleteProperty,
   updateProperty,
   getPropertyById,
+  getPropertiesByType,
 };

@@ -8,6 +8,7 @@ const compression = require("compression");
 const dotenv = require("dotenv");
 const connectDB = require("./Config/db");
 const propertyRoute = require("./Routes/propertyRoute");
+const assetPropertyRoute = require("./Routes/AssetPropertyRoute");
 const subRoutes =require("./Routes/subRoutes")
 const userRoutes =require("./Routes/userRoutes")
 const carRoutes = require("./Routes/carRoutes");
@@ -56,7 +57,8 @@ app.use(
   })
 );
 app.use('/api', searchRoutes); 
-app.use("/api", propertyRoute); 
+app.use("/api", propertyRoute);
+app.use("/api/property-asset", assetPropertyRoute); 
 app.use("/api", subRoutes); 
 app.use("/api", userRoutes); 
 app.use("/api/request-property", requestPropertyRoutes);
