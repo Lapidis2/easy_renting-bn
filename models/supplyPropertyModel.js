@@ -2,21 +2,29 @@ const mongoose = require("mongoose");
 
 const supplyPropertySchema = new mongoose.Schema({
   id: String,
-  title: String,
-  price: String,
-  status: String,
-  location: String,
+  title: { type: String, required: true },
+  price: { type: String, required: true },
+  status: { 
+    type: String, 
+    required: true,
+    enum: ['Available', 'Rent', 'Sale'],
+    default: 'Rent'
+  },
+  location: { type: String, required: true },
   owner: String,
-  contact: String,
-  description: String,
-  bedrooms: String,
-  bathrooms: String,
-  toilets: String,
-  area: String,
-  type: String,
-  features: String,
+  contact: { type: String, required: true },
+  description: { type: String, required: true },
+  bedrooms: { type: String, required: true },
+  bathrooms: { type: String, required: true },
+  toilets: { type: String, required: true },
+  area: { type: String, required: true },
+  type: {type:String, required: true, enum: ['House', 'Apartment', 'Hotel'], default: 'House'},
+  features: { type: [String], required: true },
   timeAgo: String,
-  image:  String
+  image:{
+    type:String,
+     required: true 
+    },
 });
 
 const supplyProperty = mongoose.model("SupplyProperty", supplyPropertySchema);

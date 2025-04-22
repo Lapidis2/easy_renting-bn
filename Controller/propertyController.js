@@ -22,7 +22,7 @@ const createProperty = async (req, res) => {
       features
     } = req.body;
 
-    const uploadedImage = req.file;
+    const uploadedImage = req.file  ? req.file : null;
     if (!uploadedImage) {
       return res.status(400).json({ message: "Image upload failed" });
     }
