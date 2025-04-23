@@ -5,7 +5,7 @@ exports.createAsset = async (req, res) => {
     try {
       const assetData = {
         ...req.body,
-        image: req.file ? req.file.path : 'https://via.placeholder.com/300x200.png?text=No+Image'
+        image: req.file ? req.file.path : null, 
       };
   
       const asset = await AssetProperty.create(assetData);
@@ -16,7 +16,6 @@ exports.createAsset = async (req, res) => {
     }
   };
 
-// @desc Get all assets or filter by type
 exports.getAllAssets = async (req, res) => {
     try {
       const {
