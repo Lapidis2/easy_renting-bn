@@ -27,6 +27,8 @@ exports.getAllAssets = async (req, res) => {
         fuel,
         certified,
         name,
+        image,
+        location,
         sort,
         page = 1,
         limit = 10
@@ -36,6 +38,8 @@ exports.getAllAssets = async (req, res) => {
       const filter = {};
   
       if (type) filter.type = type;
+      if (location) filter.location = location;
+      if (image) filter.image = image;
       if (status) filter.status = status;
       if (transmission) filter.transmission = transmission;
       if (fuel) filter.fuel = fuel;
