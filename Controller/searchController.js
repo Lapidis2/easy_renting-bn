@@ -1,6 +1,7 @@
 const AssetProperty = require('../models/AssetPropertyModel');
 const Property = require('../models/propertyModal');
 
+
 exports.handleSearch =  async (req, res) => {
   const query = req.query.q;
 
