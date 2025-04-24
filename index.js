@@ -16,7 +16,12 @@ const landRoutes = require("./Routes/landRoutes");
 const requestPropertyRoutes = require("./Routes/requestPropertyRoute");
 const supplyPropertyRoutes = require("./Routes/supplyPropertyRoute");
 const clothesRoutes = require("./Routes/clothesRoutes");
+
+const messageRoutes = require("./Routes/messageRoutes");
+const requestInfoRoutes = require("./Routes/requestInfoRoutes");
+
 const searchRoutes = require("./Routes/searchRoutes");
+
 dotenv.config();
 connectDB();
 const app = express();
@@ -66,6 +71,8 @@ app.use("/api/signup", userRoutes);
 app.use("/api/login", userRoutes);
 app.use("/api/supply-property", supplyPropertyRoutes);
 app.use("/api/get-all-property",supplyPropertyRoutes )
+app.use("/api", messageRoutes);
+app.use("/api", requestInfoRoutes);
 app.use('/api/car', carRoutes);
 app.use('/api', landRoutes);
 app.use('/api', clothesRoutes);
