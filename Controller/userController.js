@@ -184,6 +184,30 @@ exports.updateUserProfile = async (req, res) => {
     res.status(500).json({ message: "Error updating user profile", error: error.message });
   }
 };
+exports.updateUserRole = async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+  try {
+    const user = await User.findById(id);
+    user.role = role;
+    await user.save();
+    res.status(200).json({ message: 'Role updated', role: user.role });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update role' });
+  }
+};
+// Add to userController.js
+exports.toggleUserStatus = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId);
+    user.status = user.status === 'Active' ? 'Blocked' : 'Active';
+    await user.save();
+    res.status(200).json({ message: 'Status updated', status: user.status });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating status' });
+  }
+};
 
 exports.deleteUser = async (req, res) => {
   try {
