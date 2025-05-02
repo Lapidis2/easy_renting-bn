@@ -15,8 +15,10 @@ router.delete("/user/:id", authMiddleware, verifyUserRole(["admin"]), userContro
 router.put("/user/:id", userController.updateUserProfile);
 router.put("/user/:id/role", authMiddleware, verifyUserRole(["admin"]), userController.updateUserRole);
 router.put("/user/:id/status", authMiddleware, verifyUserRole(["admin"]), userController.toggleUserStatus);
+router.post("/message/:id", authMiddleware, verifyUserRole(["admin"]), userController.sendMessageToUser);
 router.get("/users", userController.getAllUsers);
 router.get("/session", userController.getSessionData);
 router.get("/restricted", verifyUserRole(["admin"]), userController.restricted);
+
 
 module.exports = router;

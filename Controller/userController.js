@@ -1,5 +1,6 @@
 require("dotenv").config();
 const User = require("../models/userModel");
+const Message = require("../models/messageModal");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
@@ -19,6 +20,27 @@ const transporter = nodemailer.createTransport({
 
 const checkUserByEmail = async (email) => {
   return await User.findOne({ email });
+};
+exports.sendMessageToUser = async (req, res) => {
+  try {
+    const recipient = await User.findById(req.params.id);
+    if (!recipient) return res.status(404).json({ message: 'User not found' });
+
+    const { message } = req.body;
+
+    const newMessage = new Message({
+      username: recipient.username,
+      email: recipient.email,
+      message: message
+    });
+
+    await newMessage.save();
+
+    res.status(200).json({ message: 'Message sent successfully!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error sending message' });
+  }
 };
 
 // Query to create a new user
