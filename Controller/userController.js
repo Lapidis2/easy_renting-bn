@@ -3,19 +3,18 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
-dotenv.config();
+
 const transporter = nodemailer.createTransport({
-	host: "smtp.gmail.com",
-	port: 587,
-	secure: false,
-	auth: {
-	  user: process.env.ADMIN_EMAIL,
-	  pass: process.env.ADMIN_PSWD,
-	},
-	tls: {
-	  rejectUnauthorized: false,
-	},
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: process.env.SMTP_SECURE === "true", // Use SSL
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 // Query to check if a user exists by email
@@ -81,7 +80,7 @@ exports.signup = async (req, res) => {
   try {
     const { email, username, password, role } = req.body;
 
-    
+    // Validate required fields
     if (!email || !username || !password) {
       return res.status(400).json({
         message: "Email, Username and Password are required.",
