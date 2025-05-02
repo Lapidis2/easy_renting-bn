@@ -13,6 +13,8 @@ router.post("/login", userController.login);
 router.post("/logout", userController.logout);
 router.delete("/user/:id", userController.deleteUser);
 router.put("/user/:id", userController.updateUserProfile);
+router.put("/user/:id/role", authMiddleware, verifyUserRole(["admin"]), userController.updateUserRole);
+router.put("/user/:id/status", authMiddleware, verifyUserRole(["admin"]), userController.toggleUserStatus);
 router.get("/users", userController.getAllUsers);
 router.get("/session", userController.getSessionData);
 router.get("/restricted", verifyUserRole(["admin"]), userController.restricted);
