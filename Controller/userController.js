@@ -17,7 +17,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Query to check if a user exists by email
 const checkUserByEmail = async (email) => {
   return await User.findOne({ email });
 };

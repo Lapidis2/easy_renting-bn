@@ -11,7 +11,7 @@ router.post("/signup", userController.signup);
 router.get("/confirm-email/:token", userController.confirmEmail);
 router.post("/login", userController.login);
 router.post("/logout", userController.logout);
-router.delete("/user/:id", userController.deleteUser);
+router.delete("/user/:id", authMiddleware, verifyUserRole(["admin"]), userController.deleteUser);
 router.put("/user/:id", userController.updateUserProfile);
 router.put("/user/:id/role", authMiddleware, verifyUserRole(["admin"]), userController.updateUserRole);
 router.put("/user/:id/status", authMiddleware, verifyUserRole(["admin"]), userController.toggleUserStatus);
