@@ -6,8 +6,8 @@ const requestPropertySchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Available', 'Rent', 'Sale'],
-    default: 'Rent'
+    enum: ['Available', 'Rent', 'Sale', 'Pending'],
+    default: 'Pending'
   },
     location: { type: String, required: true },
   requesterName: String,

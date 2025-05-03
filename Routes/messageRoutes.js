@@ -4,15 +4,15 @@ const verifyUserRole = require("../middleware/verifyUserRole");
 
 const router = express.Router();
 
-router.post("/", messageController.createMessage);
+router.post("/create-message", messageController.createMessage);
 
 // Admin-only routes
-router.use(verifyUserRole(["admin"])); // Protects all routes below
+router.use(verifyUserRole(["admin"])); 
 
-router.get("/", messageController.getAllMessages);
-router.get("/:id", messageController.getMessageById);
-router.delete("/:id", messageController.deleteMessage);
-router.put("/:id", messageController.updateMessage);
-router.post("/reply/:id", messageController.replyToMessage);
+router.get("/messages", messageController.getAllMessages);
+router.get("/message/:id", messageController.getMessageById);
+router.delete("/message/:id", messageController.deleteMessage);
+router.put("/message/:id", messageController.updateMessage);
+router.post("/message/reply/:id", messageController.replyToMessage);
 
 module.exports = router;

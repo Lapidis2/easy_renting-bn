@@ -11,7 +11,7 @@ const AssetSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Available', 'Rent', 'Sale'],
+    enum: ['Available', 'Rent', 'Sale', 'Pending'],
     required: false,
     default: 'Rent'
   },

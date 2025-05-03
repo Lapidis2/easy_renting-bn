@@ -18,6 +18,9 @@ const supplyPropertyRoutes = require("./Routes/supplyPropertyRoute");
 const clothesRoutes = require("./Routes/clothesRoutes");
 const messageRoutes = require("./Routes/messageRoutes");
 const requestInfoRoutes = require("./Routes/requestInfoRoutes");
+const bulkNoticationsRoutes= require("./Routes/bulkNotificationsRoutes");
+const settingsRoutes = require("./Routes/settingsRoutes");
+const supportFaqRoutes = require("./Routes/supportFAQRoutes");
 
 const searchRoutes = require("./Routes/searchRoutes");
 
@@ -60,6 +63,12 @@ app.use(
     cookie: { secure: process.env.NODE_ENV === "production" },
   })
 );
+
+// Dashboard route
+const dashboardRoutes = require("./Routes/dashboardRoutes");
+app.use("/api", dashboardRoutes);
+
+// Other routes
 app.use('/api', searchRoutes); 
 app.use("/api", propertyRoute);
 app.use("/api/property-asset", assetPropertyRoute); 
@@ -69,13 +78,15 @@ app.use("/api/request-property", requestPropertyRoutes);
 app.use("/api/signup", userRoutes);
 app.use("/api/login", userRoutes);
 app.use("/api/supply-property", supplyPropertyRoutes);
-app.use("/api/get-all-property",supplyPropertyRoutes )
-app.use("/api/messages", messageRoutes);
+app.use("/api/", messageRoutes);
 app.use("/api", requestInfoRoutes);
 app.use('/api/car', carRoutes);
 app.use('/api', landRoutes);
 app.use('/api', clothesRoutes);
-app.use("/api/confirm-email", userRoutes);	
+app.use("/api/confirm-email", userRoutes);
+app.use("/api", bulkNoticationsRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api", supportFaqRoutes);	
 app.listen(PORT, () => {
   console.log(`Server is running on  http://localhost:${PORT}`);
 });
