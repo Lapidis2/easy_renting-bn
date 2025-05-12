@@ -8,7 +8,7 @@ router.get("/", supplyPropertyController.getAllRequest);
 router.get("/:id", supplyPropertyController.getSingleRequest);
 router.put("/:id", upload.single("image"), supplyPropertyController.updateRequest);
 router.delete("/:id", supplyPropertyController.deleteRequest);
-router.put("/:id/approve", supplyPropertyController.approveRequest);
+router.put("/:id/approve",supplyPropertyController.approveRequest);
 
 
 module.exports = router;
