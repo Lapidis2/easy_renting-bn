@@ -1,7 +1,7 @@
 // routes/notificationRoutes.js
 const express = require("express");
 const router = express.Router();
-const verifyUserRole = require("../middleware/verifyUserRole");
+// const verifyUserRole = require("../middleware/verifyUserRole");
 const notificationController = require("../Controller/bulkNotficationsController");
 
 // router.use(verifyUserRole(["admin"])); 

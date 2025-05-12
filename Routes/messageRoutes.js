@@ -1,13 +1,13 @@
 const express = require("express");
 const messageController = require("../Controller/messageController");
-const verifyUserRole = require("../middleware/verifyUserRole");
+// const verifyUserRole = require("../middleware/verifyUserRole");
 
 const router = express.Router();
 
 router.post("/create-message", messageController.createMessage);
 
 // Admin-only routes
-router.use(verifyUserRole(["admin"])); 
+// router.use(verifyUserRole(["admin"])); 
 
 router.get("/messages", messageController.getAllMessages);
 router.get("/message/:id", messageController.getMessageById);
