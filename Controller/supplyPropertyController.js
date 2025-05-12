@@ -197,7 +197,7 @@ exports.approveRequest = async (req, res) => {
   try {
     const property = await SupplyProperty.findByIdAndUpdate(
       req.params.id,
-      { status: "Rent", updatedAt: new Date() },
+      { status: "Pending", updatedAt: new Date() },
       { new: true, runValidators: true }
     );
 
