@@ -39,7 +39,6 @@ exports.createSupplyProperty = async (req, res) => {
     });
   }
 };
-
 // GET ALL with Search, Sort, Filter, Pagination
 exports.getAllRequest = async (req, res) => {
   try {
@@ -94,7 +93,6 @@ exports.getAllRequest = async (req, res) => {
     });
   }
 };
-
 // GET ONE
 exports.getSingleRequest = async (req, res) => {
   try {
@@ -124,7 +122,6 @@ exports.getSingleRequest = async (req, res) => {
     });
   }
 };
-
 // UPDATE
 exports.updateRequest = async (req, res) => {
   try {
@@ -172,7 +169,6 @@ exports.updateRequest = async (req, res) => {
     });
   }
 };
-
 // DELETE
 exports.deleteRequest = async (req, res) => {
   try {
@@ -196,3 +192,32 @@ exports.deleteRequest = async (req, res) => {
     });
   }
 };
+// APPROVE
+exports.approveRequest = async (req, res) => {
+  try {
+    const property = await SupplyProperty.findByIdAndUpdate(
+      req.params.id,
+      { status: "Rent", updatedAt: new Date() },
+      { new: true, runValidators: true }
+    );
+
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Supply property not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Property approved successfully",
+      data: property,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to approve supply property",
+    });
+  }
+};
+
