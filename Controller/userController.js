@@ -4,6 +4,7 @@ const Message = require("../models/messageModal");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+const { findOne } = require("../models/requestPropertyModel");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -78,12 +79,10 @@ const updateUserProfileQuery = async (userId, username, email) => {
 const deleteUserQuery = async (userId) => {
   return await User.findByIdAndDelete(userId);
 };
-
 // Query to find all users
 const getAllUsersQuery = async () => {
   return await User.find({});
 };
-
 // Query to get monthly signups using aggregation
 const getMonthlySignupsQuery = async () => {
   return await User.aggregate([
@@ -96,7 +95,6 @@ const getMonthlySignupsQuery = async () => {
     { $sort: { _id: 1 } },
   ]);
 };
-
 exports.signup = async (req, res) => {
   try {
     const { email, username, password, role } = req.body;
@@ -107,7 +105,6 @@ exports.signup = async (req, res) => {
         message: "Email, Username and Password are required.",
       });
     }
-
     // Check if the user already exists
     const existingUser = await checkUserByEmail(email);
     if (existingUser) {
@@ -115,7 +112,8 @@ exports.signup = async (req, res) => {
         message: "User already exists with that email or Username.",
       });
     }
-
+    const hashedPassword = await bcrypt.hash(password, 10);
+    password = hashedPassword;
     const newUser = await createUser(email, username, password, role);
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
@@ -205,6 +203,24 @@ exports.updateUserProfile = async (req, res) => {
     res.status(500).json({ message: "Error updating user profile", error: error.message });
   }
 };
+exports.updateUserInformation = async (req, res) => {
+  try {
+    const updateUser = await User.findByIdAndUpdate(req.params.id,req.body, { new: true });
+    if (!updateUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+   const salt = await bcrypt.genSalt(10);
+   const hashpassword = await bcrypt.hash(req.body.password, salt);
+   updateUser.password = hashpassword;
+
+   await updateUser.save();
+    res.json({ message: "User profile updated successfully", updateUser });
+  } catch (error) {
+    console.error("Error updating user profile:", error.message);
+    res.status(500).json({ message: "Error updating user profile", error: error.message });
+  }
+};
+
 exports.updateUserRole = async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -217,7 +233,6 @@ exports.updateUserRole = async (req, res) => {
     res.status(500).json({ message: 'Failed to update role' });
   }
 };
-// Add to userController.js
 exports.toggleUserStatus = async (req, res) => {
   const userId = req.params.id;
   try {
@@ -245,13 +260,16 @@ exports.deleteUser = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = req.body.email?.trim().toLowerCase();
+    const password = req.body.password;
+
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
     }
-    const user = await checkUserByEmail(email);
+    const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials." });
     }
 
     if (!user.isConfirmed) {
@@ -260,36 +278,44 @@ exports.login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Incorrect Password" });
+      return res.status(401).json({ message: "Incorrect password." });
     }
     const token = jwt.sign(
       { userId: user._id, role: user.role, name: user.username },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-
     if (req.session) {
-      req.session.user = { userId: user._id, role: user.role, username: user.username, token: token };
+      req.session.user = {
+        userId: user._id,
+        role: user.role,
+        username: user.username,
+        token
+      };
     }
-    res.cookie(
-      "userPreferences",
-      JSON.stringify({ theme: "dark", language: "en" }),
-      {
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === "production", 
-        maxAge: 24 * 60 * 60 * 1000, 
-        sameSite: "lax", 
+    res.cookie("userPreferences", JSON.stringify({
+      theme: "dark",
+      language: "en"
+    }), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+    });
+
+    res.status(200).json({
+      message: "User logged in successfully",
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
       }
-    );
-
-
-    res
-      .status(200)
-      .json({ message: "User logged in successfully", token, user:user });
-	  console.log("User logged in successfully:", user,token);
+    });
 
   } catch (error) {
-    console.error("Error logging in user:", error);
+    console.error("Login error:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
