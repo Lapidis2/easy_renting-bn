@@ -17,6 +17,7 @@ router.put("/user/:id/role", authMiddleware, verifyUserRole(["admin"]), userCont
 router.put("/user/:id/status", authMiddleware, verifyUserRole(["admin"]), userController.toggleUserStatus);
 router.post("/message-to-user/:id", authMiddleware, verifyUserRole(["admin"]), userController.sendMessageToUser);
 router.get("/users", userController.getAllUsers);
+router.get("/user/:id", userController.getUserById);
 router.get("/session", userController.getSessionData);
 router.get("/restricted", verifyUserRole(["admin"]), userController.restricted);
 
