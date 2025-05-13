@@ -89,7 +89,8 @@ const createProperty = async (req, res) => {
             });
           });
 
-          await Promise.all(emails);
+          await Promise.allSettled(emails);
+          await newProperty.save().catch(err => console.error("Save Error:", err));
           return res.status(201).json({ status: 'success', message: 'Notifications sent to all subscribers', newProperty });
         } catch (emailError) {
           console.error("Error sending emails:", emailError);
