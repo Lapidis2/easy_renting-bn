@@ -19,6 +19,8 @@ router.post("/message-to-user/:id",  userController.sendMessageToUser);
 router.get("/users", userController.getAllUsers);
 router.get("/user/:id", userController.getUserById);
 router.get("/session", userController.getSessionData);
+router.post("/request-password-reset", userController.requestPasswordReset);
+router.post("/reset-password/:token", userController.resetPassword);
 router.get("/restricted", verifyUserRole(["admin"]), userController.restricted);
 
 module.exports = router;
