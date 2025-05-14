@@ -364,6 +364,79 @@ exports.logout = (req, res) => {
   }
 };
 
+// Request password reset - sends reset link to email
+exports.requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await checkUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: "No user found with that email." });
+    }
+
+    const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
+
+    const baseUrl =
+      process.env.NODE_ENV === "production"
+        ? "https://easy-renting-bn.onrender.com"
+        : "http://localhost:3000";
+
+    const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+
+    const mailOptions = {
+      from: `"Great Connection Services" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Password Reset Request",
+      html: `
+        <p>Hi ${user.username},</p>
+        <p>You requested a password reset. Click <a href="${resetUrl}">here</a> to reset your password.</p>
+        <p>This link will expire in 15 minutes.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "Reset link sent to email successfully." });
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    res.status(500).json({ message: "Failed to send reset link. Try again later." });
+  }
+};
+
+// Reset password with token
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "New password is required." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    const user = await findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Invalid or expired token." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashed = await bcrypt.hash(newPassword, salt);
+    user.password = hashed;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password has been reset successfully." });
+  } catch (error) {
+    console.error("Reset password error:", error.message);
+    res.status(500).json({ message: "Invalid or expired reset token." });
+  }
+};
+
+
 exports.getSessionData = (req, res) => {
   try {
     if (!req.session.user) {
