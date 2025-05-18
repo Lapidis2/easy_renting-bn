@@ -3,6 +3,7 @@ const Property = require("../models/propertyModal");
 const RequestProperty = require("../models/requestPropertyModel");
 const SupplyProperty = require("../models/supplyPropertyModel");
 const User = require("../models/userModel");
+const AssetProperty = require("../models/AssetPropertyModel")
 
 exports.getDashboardStats = async (req, res) => {
   try {
@@ -12,9 +13,11 @@ exports.getDashboardStats = async (req, res) => {
     const requestedProperties = await RequestProperty.countDocuments();
     const suppliedProperties = await SupplyProperty.countDocuments();
     const pendingApprovals = await SupplyProperty.countDocuments({ status: "pending" });
+    const  totalAssetProperties = await  AssetProperty.countDocuments();
 
     res.json({
       totalProperties,
+      totalAssetProperties,
       activeRentals,
       registeredUsers,
       requestedProperties,
