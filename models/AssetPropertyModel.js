@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require("moment");
 
 const AssetSchema = new mongoose.Schema({
 
@@ -19,8 +20,8 @@ const AssetSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Image is required']
   },
-  owner: String,
-  contact: String,
+  owner: {type: String},
+  contact: {type: String },
 
   // Car & Motorcycle
   transmission: { type: String, enum: ['Automatic', 'Manual'], default: null },
@@ -36,12 +37,12 @@ const AssetSchema = new mongoose.Schema({
   size: { type: String },
 
   // Clothes
-  condition: { type: String, enum: ['New', 'Used'], default: null },
+  condition: { type: String, enum: ['New', 'Used'], default: "New" },
   sizeCloth: { type: String },
 
   // Others
   description: { type: String },
-  timeAgo: { type: String, default: ""}
+  timeAgo: { type: String, default: moment().fromNow() },
 }, {
   timestamps: true
 });

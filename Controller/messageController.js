@@ -2,30 +2,28 @@ const Message = require("../models/messageModal");
 const User = require("../models/userModel");
 const nodemailer = require("nodemailer");
 
-
-// Notify the admin (yourself) via email
+// Configure email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.ADMIN_EMAIL,
     pass: process.env.ADMIN_PSWD,
   },
+  tls: {
+    rejectUnauthorized: false, // ⚠️ Use only in development (self-signed certs)
+  },
 });
 
-// ✅ Send message from user → admin, store in DB + email admin
+// ✅ 1. Send message from user → admin
 exports.createMessage = async (req, res) => {
   try {
     const { username, email, message: userMessage } = req.body;
+
     if (!username || !email || !userMessage) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const newMessage = new Message({
-      username,
-      email,
-      message: userMessage,
-    });
-
+    const newMessage = new Message({ username, email, message: userMessage });
     await newMessage.save();
 
     const adminEmail = {
@@ -43,13 +41,18 @@ exports.createMessage = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-// ✅ Reply to message from admin → user, store in DB + email user
+
+// ✅ 2. Reply from admin → user
 exports.replyToMessage = async (req, res) => {
   try {
+    const { replyMessage } = req.body;
+
+    if (!replyMessage || replyMessage.trim() === "") {
+      return res.status(400).json({ message: "Reply message is required" });
+    }
+
     const original = await Message.findById(req.params.id);
     if (!original) return res.status(404).json({ message: "Original message not found" });
-
-    const { replyMessage } = req.body;
 
     const user = await User.findOne({ email: original.email });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -58,29 +61,27 @@ exports.replyToMessage = async (req, res) => {
       username: "Admin",
       email: process.env.ADMIN_EMAIL,
       message: replyMessage,
-      toUser: user._id, // Optional: add if your schema supports inbox filtering
     });
 
     await reply.save();
 
-    // Email reply to user (optional but powerful)
     const replyEmail = {
-      from: process.env.ADMIN_EMAIL,
+      from: `"Support Team" <${process.env.ADMIN_EMAIL}>`,
       to: user.email,
       subject: "Reply from Admin",
-      text: `Hello ${user.name || user.username},\n\n${replyMessage}\n\n- Admin`,
+      text: `Hello ${user.name || user.username || "user"},\n\n${replyMessage}\n\nBest regards,\nAdmin`,
     };
 
     await transporter.sendMail(replyEmail);
-
+   console.log("message sent to " , user.email);
     res.json({ message: "Reply sent successfully", reply });
   } catch (err) {
     console.error("Reply error:", err);
-    res.status(500).json({ message: "Failed to send reply" });
+    res.status(500).json({ message: "Failed to send reply", error: err.message });
   }
 };
 
-// ✅ Get all messages
+// ✅ 3. Get all messages
 exports.getAllMessages = async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -90,7 +91,7 @@ exports.getAllMessages = async (req, res) => {
   }
 };
 
-// ✅ Get one message by ID
+// ✅ 4. Get one message by ID
 exports.getMessageById = async (req, res) => {
   try {
     const message = await Message.findById(req.params.id);
@@ -101,7 +102,7 @@ exports.getMessageById = async (req, res) => {
   }
 };
 
-// ✅ Delete a message
+// ✅ 5. Delete a message
 exports.deleteMessage = async (req, res) => {
   try {
     await Message.findByIdAndDelete(req.params.id);
@@ -111,7 +112,7 @@ exports.deleteMessage = async (req, res) => {
   }
 };
 
-// ✅ Update a message (e.g., mark read, edit content)
+// ✅ 6. Update a message
 exports.updateMessage = async (req, res) => {
   try {
     const updated = await Message.findByIdAndUpdate(req.params.id, req.body, { new: true });
