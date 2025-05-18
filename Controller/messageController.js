@@ -2,7 +2,6 @@ const Message = require("../models/messageModal");
 const User = require("../models/userModel");
 const nodemailer = require("nodemailer");
 
-// Configure email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -14,7 +13,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ✅ 1. Send message from user → admin
 exports.createMessage = async (req, res) => {
   try {
     const { username, email, message: userMessage } = req.body;
@@ -42,7 +40,6 @@ exports.createMessage = async (req, res) => {
   }
 };
 
-// ✅ 2. Reply from admin → user
 exports.replyToMessage = async (req, res) => {
   try {
     const { replyMessage } = req.body;
@@ -81,7 +78,6 @@ exports.replyToMessage = async (req, res) => {
   }
 };
 
-// ✅ 3. Get all messages
 exports.getAllMessages = async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -91,7 +87,6 @@ exports.getAllMessages = async (req, res) => {
   }
 };
 
-// ✅ 4. Get one message by ID
 exports.getMessageById = async (req, res) => {
   try {
     const message = await Message.findById(req.params.id);
@@ -102,7 +97,6 @@ exports.getMessageById = async (req, res) => {
   }
 };
 
-// ✅ 5. Delete a message
 exports.deleteMessage = async (req, res) => {
   try {
     await Message.findByIdAndDelete(req.params.id);
@@ -112,7 +106,6 @@ exports.deleteMessage = async (req, res) => {
   }
 };
 
-// ✅ 6. Update a message
 exports.updateMessage = async (req, res) => {
   try {
     const updated = await Message.findByIdAndUpdate(req.params.id, req.body, { new: true });
