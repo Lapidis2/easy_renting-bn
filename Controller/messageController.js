@@ -70,7 +70,7 @@ exports.replyToMessage = async (req, res) => {
     };
 
     await transporter.sendMail(replyEmail);
-   console.log("message sent to " , user.email);
+   console.log(`Admin with email: ${process.env.ADMIN_EMAIL} ,Message sent to User with email: `, user.email);
     res.json({ message: "Reply sent successfully", reply });
   } catch (err) {
     console.error("Reply error:", err);
