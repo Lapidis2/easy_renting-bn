@@ -126,9 +126,13 @@ exports.getAssetById = async (req, res) => {
 // @desc Update an asset
 exports.updateAsset = async (req, res) => {
   try {
+    const assetData = {
+      ...req.body,
+      image: req.file ? req.file.path : undefined, // Use the new image if provided
+    };
     const updatedAsset = await AssetProperty.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      assetData,
       { new: true, runValidators: true }
     );
     if (!updatedAsset) return res.status(404).json({ error: 'Asset not found' });
