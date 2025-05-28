@@ -36,7 +36,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 const allowedOrigins = [
 	"http://localhost:5173",
-	"https://paccy-easy-renting-fn.netlify.app"
+	"http://greatconnectionltd.com"
   ];
   
   app.use(
