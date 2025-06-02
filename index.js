@@ -36,7 +36,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 const allowedOrigins = [
 	"http://localhost:5173",
-	"http://greatconnectionltd.com"
+	"https://greatconnectionltd.com"
   ];
   
   app.use(
