@@ -38,7 +38,9 @@ app.use(
   cors({
     origin: [
       "https://greatconnectionltd.com",
-      "http://localhost:3000"
+      "http://localhost:5173",
+      "http://localhost:5173",
+      "https://paccy-easy-renting-fn.netlify.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
