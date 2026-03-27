@@ -279,6 +279,7 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Incorrect password." });
     }
+
     const token = jwt.sign(
       { userId: user._id, role: user.role, name: user.username },
       process.env.JWT_SECRET,
@@ -392,6 +393,7 @@ exports.requestPasswordReset = async (req, res) => {
         <p>Hi ${user.username},</p>
         <p>You requested a password reset. Click <a href="${resetUrl}">here</a> to reset your password.</p>
         <p>This link will expire in 15 minutes.</p>
+        <p>If it is not you please leave it or ignore this email.</p>
       `,
     };
 
