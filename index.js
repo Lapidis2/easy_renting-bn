@@ -34,33 +34,30 @@ app.set("views", path.join(__dirname, "views"));
 app.use(compression());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
-const allowedOrigins = [
-	"http://localhost:5173",
-	"https://greatconnectionltd.com"
-  ];
-  
-  app.use(
-	cors({
-	  origin: function (origin, callback) {
-		if (!origin || allowedOrigins.includes(origin)) {
-		  callback(null, true);
-		} else {
-		  callback(new Error("Not allowed by CORS"));
-		}
-	  },
-	  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-	  credentials: true,
-	  allowedHeaders: ["Content-Type", "Authorization"],
-	})
-  );
-app.options("*", cors());
-app.use(express.static("public"));
+app.use(
+  cors({
+    origin: [
+      "https://greatconnectionltd.com",
+      "http://localhost:3000"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.use(express.json());
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "default-secret",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === "production" },
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none"
+    },
   })
 );
 
